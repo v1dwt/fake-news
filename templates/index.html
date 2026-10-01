@@ -1,0 +1,1517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TruthLens — AI Fraud & Fake News Forensics Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-base: #070a13;
+            --bg-surface: #0e1424;
+            --bg-card: #141d33;
+            --bg-card-hover: #1b2644;
+            --bg-input: #0a0f1c;
+            --border: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(59, 130, 246, 0.4);
+            
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --text-dim: #64748b;
+            
+            --primary: #3b82f6;
+            --primary-glow: rgba(59, 130, 246, 0.25);
+            --cyan: #06b6d4;
+            --emerald: #10b981;
+            --emerald-bg: rgba(16, 185, 129, 0.12);
+            --amber: #f59e0b;
+            --amber-bg: rgba(245, 158, 11, 0.12);
+            --crimson: #ef4444;
+            --crimson-bg: rgba(239, 68, 68, 0.14);
+            --purple: #8b5cf6;
+
+            --radius-xl: 18px;
+            --radius-lg: 14px;
+            --radius-md: 10px;
+            --radius-sm: 6px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            min-height: 100vh;
+            line-height: 1.5;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.08) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(6, 182, 212, 0.06) 0px, transparent 50%);
+            background-attachment: fixed;
+            padding-bottom: 60px;
+        }
+
+        /* Top Bar */
+        .navbar {
+            background: rgba(14, 20, 36, 0.85);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 28px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar-inner {
+            max-width: 1240px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .brand-logo {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #2563eb 0%, #06b6d4 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 19px;
+            font-weight: 800;
+            color: white;
+            box-shadow: 0 0 20px rgba(37, 99, 235, 0.45);
+        }
+
+        .brand-title {
+            font-size: 21px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .brand-badge {
+            font-size: 11px;
+            font-weight: 700;
+            background: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            padding: 2px 7px;
+            border-radius: 6px;
+        }
+
+        .brand-subtitle {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .nav-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            background: var(--emerald-bg);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #34d399;
+            padding: 6px 14px;
+            border-radius: 30px;
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            animation: pulse-ring 2s infinite;
+        }
+
+        @keyframes pulse-ring {
+            0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+            100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 28px auto 0;
+            padding: 0 20px;
+        }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .hero h1 {
+            font-size: 34px;
+            font-weight: 800;
+            letter-spacing: -0.8px;
+            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 50%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .hero p {
+            font-size: 15px;
+            color: var(--text-muted);
+            max-width: 780px;
+            margin: 0 auto;
+        }
+
+        /* Quick Search Bar */
+        .search-strip {
+            background: linear-gradient(180deg, #111a33 0%, var(--bg-surface) 100%);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            border-radius: var(--radius-xl);
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.4);
+        }
+
+        .search-strip-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #38bdf8;
+            white-space: nowrap;
+        }
+
+        .search-strip-form {
+            display: flex;
+            flex: 1;
+            gap: 10px;
+        }
+
+        .search-strip-input {
+            flex: 1;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 10px 14px;
+            color: var(--text-main);
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .search-strip-input:focus {
+            border-color: var(--cyan);
+            box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.2);
+        }
+
+        .btn-search {
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            padding: 10px 22px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .btn-search:hover {
+            background: #0ea5e9;
+            transform: translateY(-1px);
+        }
+
+        /* Sample Selector */
+        .sample-deck {
+            margin-bottom: 24px;
+        }
+
+        .sample-deck-title {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--text-dim);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .sample-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 12px;
+        }
+
+        .sample-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 12px 14px;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.2s ease;
+            display: block;
+        }
+
+        .sample-card:hover {
+            border-color: var(--primary);
+            background: var(--bg-card);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px -4px rgba(0, 0, 0, 0.4);
+        }
+
+        .sample-card-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        .sample-name {
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .sample-pill {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 12px;
+            text-transform: uppercase;
+        }
+
+        .pill-real { background: var(--emerald-bg); color: #34d399; }
+        .pill-fraud { background: var(--crimson-bg); color: #f87171; }
+        .pill-clickbait { background: var(--amber-bg); color: #fbbf24; }
+        .pill-phish { background: rgba(168, 85, 247, 0.15); color: #c084fc; }
+
+        .sample-snippet {
+            font-size: 11px;
+            color: var(--text-dim);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Main Form Card */
+        .analyzer-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 26px 30px;
+            margin-bottom: 28px;
+            box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.45);
+        }
+
+        .analyzer-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .analyzer-title {
+            font-size: 18px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .input-wrapper {
+            margin-bottom: 18px;
+        }
+
+        .input-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 7px;
+        }
+
+        .field-input, .field-textarea {
+            width: 100%;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            color: var(--text-main);
+            font-size: 14px;
+            padding: 13px 16px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .field-textarea {
+            min-height: 160px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+        .field-input:focus, .field-textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-glow);
+        }
+
+        .form-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 14px;
+        }
+
+        .btn-analyze {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            padding: 13px 34px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            transition: all 0.2s;
+            box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35);
+        }
+
+        .btn-analyze:hover {
+            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 8px 24px rgba(37, 99, 235, 0.45);
+        }
+
+        .btn-reset {
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 12px 22px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .btn-reset:hover {
+            color: var(--text-main);
+            border-color: var(--text-muted);
+        }
+
+        /* -----------------------------------------------------------
+           RESULTS DASHBOARD
+        ----------------------------------------------------------- */
+        .results-section {
+            animation: slideUp 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+            margin-top: 32px;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(14px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Premium Verdict Hero */
+        .verdict-hero {
+            border-radius: var(--radius-xl);
+            padding: 28px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 28px;
+            margin-bottom: 24px;
+            border: 1px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .verdict-hero-danger {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.18) 0%, rgba(127, 29, 29, 0.22) 100%);
+            border-color: rgba(239, 68, 68, 0.45);
+            box-shadow: 0 12px 30px -8px rgba(239, 68, 68, 0.2);
+        }
+
+        .verdict-hero-warning {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.18) 0%, rgba(120, 53, 15, 0.22) 100%);
+            border-color: rgba(245, 158, 11, 0.45);
+            box-shadow: 0 12px 30px -8px rgba(245, 158, 11, 0.2);
+        }
+
+        .verdict-hero-success {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.18) 0%, rgba(6, 78, 59, 0.22) 100%);
+            border-color: rgba(16, 185, 129, 0.45);
+            box-shadow: 0 12px 30px -8px rgba(16, 185, 129, 0.2);
+        }
+
+        .verdict-badge {
+            display: inline-block;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 5px 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .vbadge-danger { background: var(--crimson); color: white; }
+        .vbadge-warning { background: var(--amber); color: #0b0f19; }
+        .vbadge-success { background: var(--emerald); color: white; }
+
+        .verdict-headline {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 6px;
+        }
+
+        .verdict-summary {
+            font-size: 15px;
+            color: #cbd5e1;
+            max-width: 680px;
+            line-height: 1.5;
+        }
+
+        .speedo-gauge-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(14, 20, 36, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--border);
+            padding: 18px 24px;
+            border-radius: var(--radius-lg);
+            min-width: 170px;
+        }
+
+        /* SVG Circular Speedo Gauge */
+        .gauge-svg {
+            width: 120px;
+            height: 120px;
+            transform: rotate(-90deg);
+        }
+
+        .gauge-bg {
+            fill: none;
+            stroke: #1e293b;
+            stroke-width: 10;
+        }
+
+        .gauge-val {
+            fill: none;
+            stroke-width: 10;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .gauge-text {
+            font-size: 22px;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+            fill: #ffffff;
+            transform: rotate(90deg);
+            transform-origin: center;
+            text-anchor: middle;
+            dominant-baseline: central;
+        }
+
+        .gauge-caption {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: var(--text-dim);
+            margin-top: 8px;
+        }
+
+        /* Segmented Tabs */
+        .tab-bar {
+            display: flex;
+            gap: 8px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 12px;
+            margin-bottom: 22px;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--text-muted);
+            padding: 8px 16px;
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-main);
+            background: var(--bg-surface);
+        }
+
+        .tab-btn.active {
+            color: white;
+            background: var(--bg-card);
+            border-color: rgba(59, 130, 246, 0.4);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; } to { opacity: 1; }
+        }
+
+        /* Forensic Metric Grid */
+        .forensic-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .f-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+        }
+
+        .f-card-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .f-card-score {
+            font-size: 26px;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+            margin-bottom: 6px;
+        }
+
+        .f-card-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        /* Multi-Model Table Card */
+        .model-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 22px;
+            margin-bottom: 24px;
+        }
+
+        .m-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .m-table th, .m-table td {
+            padding: 12px 14px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .m-table th {
+            color: var(--text-dim);
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .prog-bar-container {
+            width: 140px;
+            height: 7px;
+            background: #1e293b;
+            border-radius: 4px;
+            overflow: hidden;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+
+        .prog-fill {
+            height: 100%;
+            border-radius: 4px;
+        }
+
+        /* Reverse News Cards */
+        .reverse-panel {
+            background: var(--bg-surface);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            border-radius: var(--radius-lg);
+            padding: 22px;
+            margin-bottom: 24px;
+        }
+
+        .reverse-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .reverse-title {
+            font-size: 16px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .corrob-badge {
+            font-size: 12px;
+            font-weight: 700;
+            padding: 5px 12px;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .corrob-success { background: var(--emerald-bg); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .corrob-danger { background: var(--crimson-bg); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+        .corrob-warning { background: var(--amber-bg); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+
+        .wire-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 14px;
+            margin-top: 14px;
+        }
+
+        .wire-card {
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.2s;
+        }
+
+        .wire-card:hover {
+            border-color: var(--cyan);
+            transform: translateY(-2px);
+        }
+
+        .wire-source-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+
+        .wire-source-name {
+            font-weight: 700;
+            color: #38bdf8;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .wire-headline {
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 1.4;
+            color: #f1f5f9;
+            margin-bottom: 12px;
+        }
+
+        .wire-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .btn-link-out {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-decoration: none;
+        }
+
+        .btn-link-out:hover {
+            color: white;
+            text-decoration: underline;
+        }
+
+        .btn-pipe-story {
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            color: #60a5fa;
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-pipe-story:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* XAI Badges */
+        .xai-box {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 22px;
+            margin-bottom: 24px;
+        }
+
+        .xai-sub {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        .xai-split {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .xai-split { grid-template-columns: 1fr; }
+            .verdict-hero { flex-direction: column; align-items: flex-start; }
+            .speedo-gauge-box { width: 100%; }
+        }
+
+        .xai-col-header {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .token-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .token-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 11px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .tpill-danger {
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #f87171;
+        }
+
+        .tpill-success {
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #34d399;
+        }
+
+        /* Checklist */
+        .checklist-box {
+            background: rgba(59, 130, 246, 0.07);
+            border: 1px solid rgba(59, 130, 246, 0.25);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .checklist-title {
+            font-size: 14px;
+            font-weight: 800;
+            color: #93c5fd;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .checklist-items {
+            list-style: none;
+            font-size: 13px;
+        }
+
+        .checklist-items li {
+            margin-bottom: 6px;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .checklist-items li::before {
+            content: "✓";
+            color: #60a5fa;
+            font-weight: 800;
+        }
+
+        /* History Table Card */
+        .history-panel {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 24px;
+            margin-top: 32px;
+        }
+
+        .hist-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin-top: 14px;
+        }
+
+        .hist-table th, .hist-table td {
+            padding: 10px 14px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .hist-table th {
+            color: var(--text-dim);
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 55px;
+            font-size: 12px;
+            color: var(--text-dim);
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navbar -->
+    <header class="navbar">
+        <div class="navbar-inner">
+            <a href="/" class="brand-group">
+                <div class="brand-logo">TL</div>
+                <div>
+                    <div class="brand-title">
+                        <span>TruthLens</span>
+                        <span class="brand-badge">v2.4 Pro</span>
+                    </div>
+                    <div class="brand-subtitle">AI Fraud & Fake News Forensics Dashboard</div>
+                </div>
+            </a>
+            <div class="nav-status">
+                <span class="pulse-dot"></span>
+                De-biased Engine Active (98.9% F1)
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+
+        <!-- Hero Section -->
+        <section class="hero">
+            <h1>Forensic News & Fraud Credibility Analyzer</h1>
+            <p>
+                Evaluate news stories, financial claims, and viral headlines using multi-model machine learning consensus,
+                de-biased TF-IDF representations, and live reverse-search cross-verification against verified news wires.
+            </p>
+        </section>
+
+        <!-- Live Reverse Search Strip -->
+        <div class="search-strip">
+            <span class="search-strip-label">
+                <span>🔍</span> Reverse Wire Search:
+            </span>
+            <form method="POST" action="/" class="search-strip-form">
+                <input 
+                    type="text" 
+                    name="search_query" 
+                    class="search-strip-input" 
+                    placeholder="Search any breaking claim, viral rumor, or entity across verified wires (e.g. Federal Reserve interest rates, Gold price surge)..." 
+                    value="{{ search_query or '' }}">
+                <button type="submit" class="btn-search">Search Verified Media</button>
+            </form>
+        </div>
+
+        <!-- Sample Deck -->
+        <section class="sample-deck">
+            <div class="sample-deck-title">
+                <span>⚡ Instant Test Benchmarks (Click to load sample)</span>
+            </div>
+            <div class="sample-grid">
+                {% for key, s in samples.items() %}
+                <a href="/?sample={{ key }}" class="sample-card">
+                    <div class="sample-card-head">
+                        <span class="sample-name">{{ s.title }}</span>
+                        <span class="sample-pill 
+                            {% if 'Authentic' in s.badge %}pill-real
+                            {% elif 'Fraud' in s.badge %}pill-fraud
+                            {% elif 'Clickbait' in s.badge %}pill-clickbait
+                            {% else %}pill-phish{% endif %}">
+                            {{ s.badge }}
+                        </span>
+                    </div>
+                    <div class="sample-snippet">{{ s.headline }}</div>
+                </a>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Analyzer Input Card -->
+        <div class="analyzer-card">
+            <div class="analyzer-head">
+                <h3 class="analyzer-title">
+                    <span>📰</span> News Inspection & Forensics
+                </h3>
+                <span style="font-size: 12px; color: var(--text-dim);">IEEE Std 830-1998 Academic Standard Compliant</span>
+            </div>
+
+            <form method="POST" action="/">
+                <div class="input-wrapper">
+                    <div class="input-meta">
+                        <span>Headline / Title (Optional)</span>
+                        <span style="font-weight: 400; color: var(--text-dim);">Assists in sensationalism & reverse search query generation</span>
+                    </div>
+                    <input 
+                        type="text" 
+                        name="headline" 
+                        class="field-input" 
+                        placeholder="e.g. Federal Reserve Holds Benchmark Interest Rates Steady..." 
+                        value="{{ headline or '' }}">
+                </div>
+
+                <div class="input-wrapper">
+                    <div class="input-meta">
+                        <span>Article Content / Text (Required)</span>
+                        <span id="textStatsLabel" style="font-weight: 400; color: var(--text-dim);">0 words • ~0 min read</span>
+                    </div>
+                    <textarea 
+                        id="newsTextArea"
+                        name="content" 
+                        class="field-textarea" 
+                        placeholder="Paste full news story, investment pitch, or social media claim here..." 
+                        required>{{ content or '' }}</textarea>
+                </div>
+
+                <div class="form-actions">
+                    <a href="/" class="btn-reset">Reset Form</a>
+                    <button type="submit" class="btn-analyze">
+                        <span>Analyze Fraud & Cross-Verify</span>
+                        <span>→</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- STANDALONE REVERSE SEARCH RESULTS -->
+        {% if reverse_results and not result %}
+        <div class="reverse-panel">
+            <div class="reverse-head">
+                <div>
+                    <h3 class="reverse-title">
+                        <span>🌐</span> Verified Media Coverage for: <em>"{{ search_query }}"</em>
+                    </h3>
+                    <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">{{ reverse_results.corroboration.summary }}</p>
+                </div>
+                <span class="corrob-badge 
+                    {% if reverse_results.corroboration.badge_class == 'danger' %}corrob-danger
+                    {% elif reverse_results.corroboration.badge_class == 'warning' %}corrob-warning
+                    {% elif reverse_results.corroboration.badge_class == 'success' %}corrob-success
+                    {% else %}corrob-warning{% endif %}">
+                    {{ reverse_results.corroboration.badge }}
+                </span>
+            </div>
+
+            {% if reverse_results.articles %}
+            <div class="wire-grid">
+                {% for item in reverse_results.articles %}
+                <div class="wire-card">
+                    <div>
+                        <div class="wire-source-row">
+                            <span class="wire-source-name">
+                                {% if item.is_verified %}✓ {% endif %}{{ item.source }}
+                            </span>
+                            <span style="color: var(--text-dim); font-size: 11px;">{{ item.pub_date }}</span>
+                        </div>
+                        <h4 class="wire-headline">{{ item.title }}</h4>
+                    </div>
+                    <div class="wire-actions">
+                        <a href="{{ item.link }}" target="_blank" rel="noopener noreferrer" class="btn-link-out">
+                            View Source Wire ↗
+                        </a>
+                        <form method="POST" action="/" style="margin: 0;">
+                            <input type="hidden" name="headline" value="{{ item.title }}">
+                            <input type="hidden" name="content" value="{{ item.title }}. Reported by {{ item.source }}.">
+                            <button type="submit" class="btn-pipe-story">⚡ Inspect Story</button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p style="color: var(--text-dim); font-size: 13px; margin-top: 10px;">
+                No matching articles found in verified news feeds.
+            </p>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- FULL ANALYSIS RESULTS SECTION -->
+        {% if result %}
+        <div class="results-section">
+
+            <!-- Primary Verdict Hero with Circular SVG Gauge -->
+            <div class="verdict-hero 
+                {% if result.risk_class == 'danger' %}verdict-hero-danger
+                {% elif result.risk_class == 'warning' %}verdict-hero-warning
+                {% else %}verdict-hero-success{% endif %}">
+                
+                <div style="flex: 1;">
+                    <span class="verdict-badge 
+                        {% if result.risk_class == 'danger' %}vbadge-danger
+                        {% elif result.risk_class == 'warning' %}vbadge-warning
+                        {% else %}vbadge-success{% endif %}">
+                        {{ result.risk_level }}
+                    </span>
+                    <h2 class="verdict-headline">{{ result.primary_verdict }}</h2>
+                    <p class="verdict-summary">{{ result.summary }}</p>
+                    
+                    <div style="margin-top: 12px; font-size: 12px; color: var(--text-dim); display: flex; gap: 16px;">
+                        <span>⏱️ Latency: <strong>{{ result.elapsed_ms }} ms</strong></span>
+                        <span>📊 Models: <strong>{{ result.models.consensus }}</strong></span>
+                    </div>
+                </div>
+
+                <!-- Circular SVG Speedo Gauge -->
+                <div class="speedo-gauge-box">
+                    {% set r_score = result.fraud_risk_score %}
+                    {% set circumference = 282.74 %}
+                    {% set offset = circumference - (circumference * r_score / 100) %}
+                    <svg class="gauge-svg" viewBox="0 0 100 100">
+                        <circle class="gauge-bg" cx="50" cy="50" r="45"></circle>
+                        <circle class="gauge-val" cx="50" cy="50" r="45"
+                            stroke="{% if r_score >= 65 %}#ef4444{% elif r_score >= 35 %}#f59e0b{% else %}#10b981{% endif %}"
+                            stroke-dasharray="282.74"
+                            stroke-dashoffset="{{ offset }}">
+                        </circle>
+                        <text x="50" y="50" class="gauge-text">{{ r_score }}%</text>
+                    </svg>
+                    <div class="gauge-caption">Fraud Risk Score</div>
+                </div>
+            </div>
+
+            <!-- Segmented View Tabs -->
+            <div class="tab-bar">
+                <button class="tab-btn active" onclick="switchTab('tab-forensics', this)">
+                    📊 Forensic Indicators
+                </button>
+                <button class="tab-btn" onclick="switchTab('tab-reverse', this)">
+                    🌐 Reverse Media Search ({{ result.reverse_news.articles|length if result.reverse_news else 0 }})
+                </button>
+                <button class="tab-btn" onclick="switchTab('tab-models', this)">
+                    🤖 AI Consensus (3 Models)
+                </button>
+                <button class="tab-btn" onclick="switchTab('tab-xai', this)">
+                    🔍 Explainable AI (XAI)
+                </button>
+            </div>
+
+            <!-- TAB 1: FORENSIC INDICATORS -->
+            <div id="tab-forensics" class="tab-content active">
+                <div class="forensic-grid">
+                    
+                    <!-- Financial & Phishing Scams -->
+                    <div class="f-card">
+                        <div class="f-card-label">
+                            <span>💰 Financial Scams</span>
+                            <span class="sample-pill {% if result.forensics.scams.detected_patterns %}pill-fraud{% else %}pill-real{% endif %}">
+                                {{ result.forensics.scams.detected_patterns|length }} Flagged
+                            </span>
+                        </div>
+                        <div class="f-card-score {% if result.forensics.scams.detected_patterns %}text-danger{% else %}text-success{% endif %}">
+                            {{ result.forensics.scams.scam_score }}%
+                        </div>
+                        <div class="f-card-desc">
+                            {% if result.forensics.scams.detected_patterns %}
+                                {% for p in result.forensics.scams.detected_patterns %}
+                                    • {{ p.label }}<br>
+                                {% endfor %}
+                            {% else %}
+                                No high-yield investment scams, crypto multipliers, or phishing patterns identified.
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Sensationalism & Clickbait -->
+                    <div class="f-card">
+                        <div class="f-card-label">
+                            <span>⚡ Sensationalism</span>
+                            <span style="font-size: 11px; color: var(--text-dim);">Score / 100</span>
+                        </div>
+                        <div class="f-card-score {% if result.forensics.sensationalism.score >= 50 %}text-danger{% elif result.forensics.sensationalism.score >= 25 %}text-warning{% else %}text-success{% endif %}">
+                            {{ result.forensics.sensationalism.score }}
+                        </div>
+                        <div class="f-card-desc">
+                            CAPS word ratio: {{ result.forensics.sensationalism.caps_ratio_pct }}% | Exclamations: {{ result.forensics.sensationalism.exclamation_count }}
+                            {% if result.forensics.sensationalism.clickbait_hits %}
+                                <br>Triggers: {{ result.forensics.sensationalism.clickbait_hits|join(", ") }}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Urgency & Pressure Cues -->
+                    <div class="f-card">
+                        <div class="f-card-label">
+                            <span>⏳ Urgency Pressure</span>
+                            <span style="font-size: 11px; color: var(--text-dim);">Score / 100</span>
+                        </div>
+                        <div class="f-card-score {% if result.forensics.urgency.score >= 50 %}text-danger{% elif result.forensics.urgency.score >= 25 %}text-warning{% else %}text-success{% endif %}">
+                            {{ result.forensics.urgency.score }}
+                        </div>
+                        <div class="f-card-desc">
+                            {% if result.forensics.urgency.urgency_hits %}
+                                Urgency triggers: {{ result.forensics.urgency.urgency_hits|join(", ") }}
+                            {% else %}
+                                Neutral pacing; no coercive artificial deadlines or panic language detected.
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Attribution & Credibility -->
+                    <div class="f-card">
+                        <div class="f-card-label">
+                            <span>📰 Source Attribution</span>
+                            <span style="font-size: 11px; color: var(--text-dim);">Score / 100</span>
+                        </div>
+                        <div class="f-card-score text-success">
+                            {{ result.forensics.credibility.score }}
+                        </div>
+                        <div class="f-card-desc">
+                            Direct quote statements: {{ result.forensics.credibility.quote_count }}
+                            {% if result.forensics.credibility.attribution_hits %}
+                                <br>Citations: {{ result.forensics.credibility.attribution_hits|join(", ") }}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Actionable Checklist -->
+                <div class="checklist-box">
+                    <div class="checklist-title">
+                        <span>💡 Actionable Verification Checklist</span>
+                    </div>
+                    <ul class="checklist-items">
+                        {% for item in result.advice %}
+                        <li>{{ item }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+            <!-- TAB 2: REVERSE MEDIA SEARCH -->
+            <div id="tab-reverse" class="tab-content">
+                <div class="reverse-panel">
+                    <div class="reverse-head">
+                        <div>
+                            <h3 class="reverse-title">
+                                <span>🔍</span> Live Reverse News Coverage & Fact-Checks
+                            </h3>
+                            <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">
+                                Extracted Entity Query: <strong>"{{ result.reverse_news.query }}"</strong> — {{ result.reverse_news.corroboration.summary }}
+                            </p>
+                        </div>
+                        <span class="corrob-badge 
+                            {% if result.reverse_news.corroboration.badge_class == 'danger' %}corrob-danger
+                            {% elif result.reverse_news.corroboration.badge_class == 'warning' %}corrob-warning
+                            {% elif result.reverse_news.corroboration.badge_class == 'success' %}corrob-success
+                            {% else %}corrob-warning{% endif %}">
+                            {{ result.reverse_news.corroboration.badge }}
+                        </span>
+                    </div>
+
+                    {% if result.reverse_news.articles %}
+                    <div class="wire-grid">
+                        {% for item in result.reverse_news.articles %}
+                        <div class="wire-card">
+                            <div>
+                                <div class="wire-source-row">
+                                    <span class="wire-source-name">
+                                        {% if item.is_verified %}✓ {% endif %}{{ item.source }}
+                                    </span>
+                                    <span style="color: var(--text-dim); font-size: 11px;">{{ item.pub_date }}</span>
+                                </div>
+                                <h4 class="wire-headline">{{ item.title }}</h4>
+                            </div>
+                            <div class="wire-actions">
+                                <a href="{{ item.link }}" target="_blank" rel="noopener noreferrer" class="btn-link-out">
+                                    Read on {{ item.source }} ↗
+                                </a>
+                                <form method="POST" action="/" style="margin: 0;">
+                                    <input type="hidden" name="headline" value="{{ item.title }}">
+                                    <input type="hidden" name="content" value="{{ item.title }}. Reported by {{ item.source }}.">
+                                    <button type="submit" class="btn-pipe-story">⚡ Inspect Story</button>
+                                </form>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p style="color: var(--text-dim); font-size: 13px; margin-top: 10px;">
+                        ⚠️ No recent corroborating reports found from credible news wires. Unverified assertions or isolated claims carry elevated risk.
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- TAB 3: MULTI-MODEL AI CONSENSUS -->
+            <div id="tab-models" class="tab-content">
+                <div class="model-card">
+                    <table class="m-table">
+                        <thead>
+                            <tr>
+                                <th>Model Architecture</th>
+                                <th>Classification Verdict</th>
+                                <th>Probability / Confidence</th>
+                                <th>Model Role</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Logistic Regression</strong> (Primary)</td>
+                                <td>
+                                    <span class="{% if 'Fake' in result.models.logistic_regression.verdict %}text-danger{% else %}text-success{% endif %}" style="font-weight: 700;">
+                                        {{ result.models.logistic_regression.verdict }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="prog-bar-container">
+                                        <div class="prog-fill {% if 'Fake' in result.models.logistic_regression.verdict %}pill-fraud{% else %}pill-real{% endif %}" style="width: {{ result.models.logistic_regression.confidence_pct }}%;"></div>
+                                    </div>
+                                    <strong>{{ result.models.logistic_regression.confidence_pct }}%</strong>
+                                </td>
+                                <td style="color: var(--text-muted);">Calibrated probabilistic baseline (de-biased)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Multinomial Naive Bayes</strong></td>
+                                <td>
+                                    <span class="{% if 'Fake' in result.models.naive_bayes.verdict %}text-danger{% else %}text-success{% endif %}" style="font-weight: 700;">
+                                        {{ result.models.naive_bayes.verdict }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="prog-bar-container">
+                                        <div class="prog-fill {% if 'Fake' in result.models.naive_bayes.verdict %}pill-fraud{% else %}pill-real{% endif %}" style="width: {{ result.models.naive_bayes.fake_prob_pct }}%;"></div>
+                                    </div>
+                                    <strong>Deceptive Prob: {{ result.models.naive_bayes.fake_prob_pct }}%</strong>
+                                </td>
+                                <td style="color: var(--text-muted);">Word occurrence distribution analysis</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Passive-Aggressive Classifier</strong></td>
+                                <td>
+                                    <span class="{% if 'Fake' in result.models.passive_aggressive.verdict %}text-danger{% else %}text-success{% endif %}" style="font-weight: 700;">
+                                        {{ result.models.passive_aggressive.verdict }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="prog-bar-container">
+                                        <div class="prog-fill {% if 'Fake' in result.models.passive_aggressive.verdict %}pill-fraud{% else %}pill-real{% endif %}" style="width: {{ result.models.passive_aggressive.confidence_pct }}%;"></div>
+                                    </div>
+                                    <strong>Margin Confidence: {{ result.models.passive_aggressive.confidence_pct }}%</strong>
+                                </td>
+                                <td style="color: var(--text-muted);">High-margin linear boundary classifier</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB 4: EXPLAINABLE AI (XAI) -->
+            <div id="tab-xai" class="tab-content">
+                <div class="xai-box">
+                    <p class="xai-sub">
+                        Mathematical decomposition showing individual word contributions ($\text{TF-IDF} \times \beta_i$) that drove the model's verdict:
+                    </p>
+                    <div class="xai-split">
+                        <div>
+                            <div class="xai-col-header" style="color: #f87171;">🚩 Top Suspicious / Fraud Indicators</div>
+                            <div class="token-group">
+                                {% if result.xai.suspicious_terms %}
+                                    {% for item in result.xai.suspicious_terms %}
+                                        <span class="token-pill tpill-danger">
+                                            {{ item.word }} <small>+{{ item.weight }}</small>
+                                        </span>
+                                    {% endfor %}
+                                {% else %}
+                                    <span style="font-size: 13px; color: var(--text-dim);">No strong suspicious terms detected</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="xai-col-header" style="color: #34d399;">🛡️ Top Credibility / Trust Indicators</div>
+                            <div class="token-group">
+                                {% if result.xai.credible_terms %}
+                                    {% for item in result.xai.credible_terms %}
+                                        <span class="token-pill tpill-success">
+                                            {{ item.word }} <small>-{{ item.weight }}</small>
+                                        </span>
+                                    {% endfor %}
+                                {% else %}
+                                    <span style="font-size: 13px; color: var(--text-dim);">No strong credibility terms detected</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        {% endif %}
+
+        <!-- Scan History Section -->
+        {% if history %}
+        <div class="history-panel">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="font-size: 16px; font-weight: 800;">🕒 Recent Audit Logs</h3>
+                <span style="font-size: 12px; color: var(--text-dim);">Session Cache</span>
+            </div>
+            <table class="hist-table">
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Headline / Preview</th>
+                        <th>Risk Score</th>
+                        <th>Verdict</th>
+                        <th>Corroboration</th>
+                        <th>Latency</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in history %}
+                    <tr>
+                        <td style="color: var(--text-dim); font-size: 12px;">{{ entry.timestamp }}</td>
+                        <td style="font-weight: 600;">{{ entry.headline }}</td>
+                        <td>
+                            <strong class="{% if entry.risk_class == 'danger' %}text-danger{% elif entry.risk_class == 'warning' %}text-warning{% else %}text-success{% endif %}">
+                                {{ entry.risk_score }}%
+                            </strong>
+                        </td>
+                        <td>
+                            <span class="sample-pill {% if entry.risk_class == 'danger' %}pill-fraud{% elif entry.risk_class == 'warning' %}pill-clickbait{% else %}pill-real{% endif %}">
+                                {{ entry.risk_level }}
+                            </span>
+                        </td>
+                        <td style="color: #38bdf8; font-size: 12px;">{{ entry.corroboration_badge or 'N/A' }}</td>
+                        <td style="color: var(--text-dim); font-family: monospace;">{{ entry.elapsed_ms }} ms</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+
+        <!-- Academic & Architecture Footer -->
+        <footer class="footer">
+            <p><strong>TruthLens — 3rd Year B.Tech Engineering Project</strong> • Department of Electronics & Communication Engineering</p>
+            <p style="margin-top: 4px;">Standard Academic Compliance: IEEE Std 830-1998 • Multi-Model NLP Pipeline (Logistic Regression, Naive Bayes, Passive-Aggressive) + Reverse Search</p>
+        </footer>
+
+    </main>
+
+    <script>
+        // Tab switching logic
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            const target = document.getElementById(tabId);
+            if (target) target.classList.add('active');
+            if (btn) btn.classList.add('active');
+        }
+
+        // Live text statistics
+        const textArea = document.getElementById('newsTextArea');
+        const statsLabel = document.getElementById('textStatsLabel');
+
+        function updateStats() {
+            if (!textArea || !statsLabel) return;
+            const text = textArea.value.trim();
+            const words = text ? text.split(/\s+/).length : 0;
+            const chars = text.length;
+            const readTime = Math.ceil(words / 200);
+            statsLabel.textContent = `${words} words (${chars} chars) • ~${readTime} min read`;
+        }
+
+        if (textArea) {
+            textArea.addEventListener('input', updateStats);
+            updateStats();
+        }
+    </script>
+</body>
+</html>

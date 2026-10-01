@@ -1,0 +1,53 @@
+{
+    "LogisticRegression": {
+        "accuracy": 0.9886,
+        "precision": 0.991,
+        "recall": 0.9872,
+        "f1_score": 0.9891,
+        "confusion_matrix": [
+            [
+                4242,
+                42
+            ],
+            [
+                60,
+                4636
+            ]
+        ],
+        "training_time_sec": 0.35
+    },
+    "MultinomialNB": {
+        "accuracy": 0.9565,
+        "precision": 0.9563,
+        "recall": 0.9606,
+        "f1_score": 0.9585,
+        "confusion_matrix": [
+            [
+                4078,
+                206
+            ],
+            [
+                185,
+                4511
+            ]
+        ],
+        "training_time_sec": 0.03
+    },
+    "PassiveAggressive": {
+        "accuracy": 0.993,
+        "precision": 0.9947,
+        "recall": 0.9919,
+        "f1_score": 0.9933,
+        "confusion_matrix": [
+            [
+                4259,
+                25
+            ],
+            [
+                38,
+                4658
+            ]
+        ],
+        "training_time_sec": 0.25
+    }
+}
